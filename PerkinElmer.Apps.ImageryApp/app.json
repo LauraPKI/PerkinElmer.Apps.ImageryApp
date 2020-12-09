@@ -1,0 +1,115 @@
+{
+    "name": "PerkinElmer.Apps.ImageryApp",
+    "description": "Imagery IHC App created from template",
+    "group": "Core",
+    "enabledIcon": "icons/translational.png",
+    "disabledIcon": "icons/translational.png",
+    "image": "previews/default.png",
+    "pageName": "PerkinElmer.Apps.ImageryApp",
+    "parameters": [
+        {
+            "name": "Input Table",
+            "id": "inputTable",
+            "type": "table"
+        }, {
+            "name": "Sample column",
+            "id": "samples",
+            "type": "column",
+            "parentSettings": {
+                "id": "inputTable"
+            },
+            "dataValidation": [{
+              "expression": "\"${__TABLE}.{__COLUMN}.{DataType}\" ~= \"String\"",
+              "description": "Only columns of String type"
+            }]
+        },
+        {
+            "name": "Marker column",
+            "id": "marker",
+            "type": "column",
+            "parentSettings": {
+                "id": "inputTable"
+            },
+            "dataValidation": [{
+              "expression": "\"${__TABLE}.{__COLUMN}.{DataType}\" ~= \"String\"",
+              "description": "Only columns of String type"
+            }]
+        },
+        {
+            "name": "Analysis region column",
+            "id": "region",
+            "type": "column",
+            "parentSettings": {
+                "id": "inputTable"
+            },
+            "dataValidation": [{
+              "expression": "\"${__TABLE}.{__COLUMN}.{DataType}\" ~= \"String\"",
+              "description": "Only columns of String type"
+            }]
+        }
+        ,{
+            "name": "Feature column",
+            "id": "features",
+            "type": "column",
+            "parentSettings": {
+                "id": "inputTable"
+            },
+            "dataValidation": [{
+              "expression": "\"${__TABLE}.{__COLUMN}.{DataType}\" ~= \"String\"",
+              "description": "Only columns of String type"
+            }]
+        },
+        {
+            "name": "Value column",
+            "id": "values",
+            "type": "column",
+            "parentSettings": {
+                "id": "inputTable"
+            },      
+            "dataValidation": [{
+                "expression": "\"${__TABLE}.{__COLUMN}.{DataType}\" ~= \"Real\" or \"${__TABLE}.{__COLUMN}.{DataType}\" ~= \"Integer\"",
+                "description": "Only columns of Real or Integer type"
+            }]
+        },
+        {
+            "name": "Select feature to analyze",
+            "id": "featureSelection",
+            "type": "value",
+            "parentSettings": {
+                "id": "features"
+            },
+            "dataValidation": [{
+              "expression": "\"${__TABLE}.{__COLUMN}.{DataType}\" ~= \"String\"",
+              "description": "Only columns of String type"
+            }]
+        },
+        {
+            "name": "Categories to compare",
+            "id": "categories",
+            "type": "column",
+            "multi": true,
+            "parentSettings": {
+                "id": "inputTable"
+            },
+            "dataValidation": [{
+              "expression": "\"${__TABLE}.{__COLUMN}.{DataType}\" ~= \"String\"",
+              "description": "Only columns of String type"
+            }]
+        },
+        {
+            "name": "Aggregation method",
+            "id": "aggmethod",
+            "type": "value"
+        },
+        {
+            "name": "Statistics table",
+            "id": "statResult",
+            "type": "table"
+        },
+        {
+            "name": "Cut off table",
+            "id": "cutOffTable",
+            "type": "table"
+        }
+        ]
+ }

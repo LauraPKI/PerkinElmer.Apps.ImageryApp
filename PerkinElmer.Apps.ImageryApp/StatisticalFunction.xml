@@ -1,0 +1,240 @@
+<?xml version="1.0"?>
+<ScriptFunctionDefinition xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Version Major="1" Minor="0" />
+  <Name>PerkinElmer.Apps.ImageryApp.id3028.statisticsDF</Name>
+  <Script>library(reshape)
+# Dataframe to IHC object
+toIHC &lt;- function(slide, valCol, catCols){
+  values &lt;- as.numeric(slide[,valCol])
+  if (length(catCols) == 1){
+    descriptor &lt;-   as.character(slide[1, catCols])
+  }
+  else {
+    descriptor &lt;-   as.character(apply( slide[1, catCols] , 1 , paste , collapse = "-" ))
+  }
+  list(values=values, descriptor =descriptor)
+}
+# Normality test
+normality &lt;- function(x){
+  if (length(x) &lt; 5000){
+    test &lt;- shapiro.test(x) 
+  } else {
+    test &lt;- ks.test(x,y='pnorm',alternative='two.sided')
+  }
+  test
+}
+# ttest analysis
+ttest &lt;- function(names, datasets){
+  
+  # Get values
+  data_subset_1 &lt;- datasets[[names[1]]]$values
+  data_subset_2 &lt;-  datasets[[names[2]]]$values
+  
+  #Check the normality of the data
+  
+  test_normalite1=normality(data_subset_1) 
+  test_normalite2=normality(data_subset_2)
+  
+  #then we check the homogeneity of the variances
+  test_variance=var.test(data_subset_1, data_subset_2)
+  
+  testResult &lt;- NULL
+  testResult$variable1 &lt;- datasets[[names[1]]]$descriptor
+  testResult$variable2 &lt;- datasets[[names[2]]]$descriptor
+  
+  if (test_normalite1$p.value &gt; 0.05 &amp; test_normalite2$p.value &gt; 0.05 &amp; test_variance$p.value&gt;0.05){
+    #if the data are normal and the variances are homogeneous, a t-test is applied
+    res_test_t=t.test(data_subset_1,data_subset_2)
+    testResult$t=res_test_t$statistic
+    testResult$p_value=res_test_t$p.value
+    testResult$degree_of_freedom=res_test_t$parameter
+    testResult$test &lt;- "t test"
+    testResult$W=""
+  } else {
+    #else a Mann-Withney test is applied
+    res_test_wilcox=suppressWarnings(wilcox.test(data_subset_1,data_subset_2, paired=FALSE))
+    testResult$W=res_test_wilcox$statistic
+    testResult$p_value=res_test_wilcox$p.value
+    testResult$test &lt;- "Mann-Withney test"
+    testResult$t=""
+    testResult$degree_of_freedom=""
+  }
+  
+  return (as.data.frame(testResult))
+}
+## Main code
+# parameters
+catColumns &lt;- unlist(strsplit(categories,"\n"))
+aggColumn &lt;- catColumns[1]
+# Clean df
+inputTable &lt;- inputTable[inputTable[,features] == featureSelection,c(values,catColumns,samples,marker,features)]
+inputTable[inputTable == ""] &lt;- NA
+inputTable&lt;-inputTable[complete.cases(inputTable),]
+
+# Split in subsets
+subsets &lt;- split(inputTable[,c(values,catColumns)], inputTable[,catColumns], drop=TRUE)
+sets &lt;- lapply(subsets, toIHC, values, catColumns)
+# Get aggregated datasets
+if (aggmethod %in% c("max","min","mean")){
+  aggdf &lt;- aggregate(inputTable[,values] ~ inputTable[,samples] + inputTable[,aggColumn] , data=inputTable[,c(values,samples,aggColumn)], get(aggmethod), na.rm=TRUE)
+  colnames(aggdf) &lt;- c(samples,aggColumn,values)
+  aggdf[,aggColumn] &lt;- paste(aggdf[,aggColumn], "(aggregated by ",aggmethod,")")
+  aggsubsets &lt;- split(aggdf[,c(values,aggColumn)], aggdf[,aggColumn])
+  aggsets &lt;- lapply(aggsubsets, toIHC, values, aggColumn)
+  sets &lt;- c(sets, aggsets)
+}
+# Analyze pairwise combinations
+combinations &lt;- combn(names(sets),2,FUN=ttest,simplify=FALSE, sets)
+statResult &lt;- do.call("rbind",combinations)
+
+# Create table for cut off visualization
+cutOffTable &lt;- inputTable
+cutOffTable$'&gt;5'=ifelse(inputTable[,values]&gt;5,inputTable[,samples],0)
+cutOffTable$'&gt;10'=ifelse(inputTable[,values]&gt;10,inputTable[,samples],0)
+cutOffTable$'&gt;20'=ifelse(inputTable[,values]&gt;20,inputTable[,samples],0)
+cutOffTable$'&gt;30'=ifelse(inputTable[,values]&gt;30,inputTable[,samples],0)
+cutOffTable$'&gt;40'=ifelse(inputTable[,values]&gt;40,inputTable[,samples],0)
+cutOffTable$'&gt;50'=ifelse(inputTable[,values]&gt;50,inputTable[,samples],0)
+cutOffTable[,values]&lt;-NULL
+df &lt;- aggregate(cutOffTable[,samples] ~ cutOffTable[,features]+cutOffTable[,marker], cutOffTable, function(x) length(unique(x)))
+colnames(df) &lt;- c(features,marker,"PatientsPerGroup")
+cutOffTable &lt;- merge(cutOffTable,df,by=c(marker,features))
+cutOffTable&lt;-melt(cutOffTable,id.vars = c(features,marker,samples,"PatientsPerGroup",aggColumn,region))
+
+</Script>
+  <Language>TERR</Language>
+  <Input>
+    <Name>inputTable</Name>
+    <Type>Table</Type>
+    <DisplayName>inputTable</DisplayName>
+    <Description />
+    <AllowedDataType>Integer</AllowedDataType>
+    <AllowedDataType>Double</AllowedDataType>
+    <AllowedDataType>Float</AllowedDataType>
+    <AllowedDataType>Decimal</AllowedDataType>
+    <AllowedDataType>String</AllowedDataType>
+    <AllowedDataType>Date</AllowedDataType>
+    <AllowedDataType>Time</AllowedDataType>
+    <AllowedDataType>DateTime</AllowedDataType>
+    <AllowedDataType>Bool</AllowedDataType>
+    <AllowedDataType>Binary</AllowedDataType>
+  </Input>
+  <Input>
+    <Name>values</Name>
+    <Type>Value</Type>
+    <DisplayName>values</DisplayName>
+    <Description />
+    <AllowedDataType>Integer</AllowedDataType>
+    <AllowedDataType>Double</AllowedDataType>
+    <AllowedDataType>Float</AllowedDataType>
+    <AllowedDataType>Decimal</AllowedDataType>
+    <AllowedDataType>String</AllowedDataType>
+    <AllowedDataType>Date</AllowedDataType>
+    <AllowedDataType>Time</AllowedDataType>
+    <AllowedDataType>DateTime</AllowedDataType>
+    <AllowedDataType>Bool</AllowedDataType>
+    <AllowedDataType>Binary</AllowedDataType>
+  </Input>
+  <Input>
+    <Name>features</Name>
+    <Type>Value</Type>
+    <DisplayName>features</DisplayName>
+    <Description />
+    <AllowedDataType>String</AllowedDataType>
+  </Input>
+  <Input>
+    <Name>featureSelection</Name>
+    <Type>Value</Type>
+    <DisplayName>featureSelection</DisplayName>
+    <Description />
+    <AllowedDataType>String</AllowedDataType>
+  </Input>
+  <Input>
+    <Name>aggmethod</Name>
+    <Type>Value</Type>
+    <DisplayName>aggmethod</DisplayName>
+    <Description />
+    <AllowedDataType>String</AllowedDataType>
+  </Input>
+  <Input>
+    <Name>categories</Name>
+    <Type>Value</Type>
+    <DisplayName>categories</DisplayName>
+    <Description />
+    <AllowedDataType>Integer</AllowedDataType>
+    <AllowedDataType>Double</AllowedDataType>
+    <AllowedDataType>Float</AllowedDataType>
+    <AllowedDataType>Decimal</AllowedDataType>
+    <AllowedDataType>String</AllowedDataType>
+    <AllowedDataType>Date</AllowedDataType>
+    <AllowedDataType>Time</AllowedDataType>
+    <AllowedDataType>DateTime</AllowedDataType>
+    <AllowedDataType>Bool</AllowedDataType>
+    <AllowedDataType>Binary</AllowedDataType>
+  </Input>
+  <Input>
+    <Name>marker</Name>
+    <Type>Value</Type>
+    <DisplayName>marker</DisplayName>
+    <Description />
+    <AllowedDataType>Integer</AllowedDataType>
+    <AllowedDataType>Double</AllowedDataType>
+    <AllowedDataType>Float</AllowedDataType>
+    <AllowedDataType>Decimal</AllowedDataType>
+    <AllowedDataType>String</AllowedDataType>
+    <AllowedDataType>Date</AllowedDataType>
+    <AllowedDataType>Time</AllowedDataType>
+    <AllowedDataType>DateTime</AllowedDataType>
+    <AllowedDataType>Bool</AllowedDataType>
+    <AllowedDataType>Binary</AllowedDataType>
+  </Input>
+  <Input>
+    <Name>samples</Name>
+    <Type>Value</Type>
+    <DisplayName>samples</DisplayName>
+    <Description />
+    <AllowedDataType>Integer</AllowedDataType>
+    <AllowedDataType>Double</AllowedDataType>
+    <AllowedDataType>Float</AllowedDataType>
+    <AllowedDataType>Decimal</AllowedDataType>
+    <AllowedDataType>String</AllowedDataType>
+    <AllowedDataType>Date</AllowedDataType>
+    <AllowedDataType>Time</AllowedDataType>
+    <AllowedDataType>DateTime</AllowedDataType>
+    <AllowedDataType>Bool</AllowedDataType>
+    <AllowedDataType>Binary</AllowedDataType>
+  </Input>
+  <Input>
+    <Name>region</Name>
+    <Type>Value</Type>
+    <DisplayName>region</DisplayName>
+    <Description />
+    <AllowedDataType>Integer</AllowedDataType>
+    <AllowedDataType>Double</AllowedDataType>
+    <AllowedDataType>Float</AllowedDataType>
+    <AllowedDataType>Decimal</AllowedDataType>
+    <AllowedDataType>String</AllowedDataType>
+    <AllowedDataType>Date</AllowedDataType>
+    <AllowedDataType>Time</AllowedDataType>
+    <AllowedDataType>DateTime</AllowedDataType>
+    <AllowedDataType>Bool</AllowedDataType>
+    <AllowedDataType>Binary</AllowedDataType>
+    <AllowedDataType>Long</AllowedDataType>
+  </Input>
+  <Output>
+    <Name>statResult</Name>
+    <Type>Table</Type>
+    <DisplayName>statResult</DisplayName>
+    <Description />
+  </Output>
+  <Output>
+    <Name>cutOffTable</Name>
+    <Type>Table</Type>
+    <DisplayName>cutOffTable</DisplayName>
+    <Description />
+  </Output>
+  <Description />
+  <AllowCaching>false</AllowCaching>
+  <ApprovalStamp>AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAMIP131JD9ki/24RF6W9/nQAAAAACAAAAAAADZgAAwAAAABAAAAAWh8TtUOqUot7sS9vigdTWAAAAAASAAACgAAAAEAAAAJy6cw0w5Zv4bbHJjZr0OgSIAAAA4Klmad8VhHRDAZ4r/OXyIzlQarvcfCDCHnkOrJfvPfUzLgd69qsGZ0Ny7bgS73opRj9F3kmNAyEn4nKwjxzY7Bc7ZkQhimajHM3tClzymTWRapQ6XKopBMdtw7pr0nKuRij4jKVb0EiUoZGXi0BiNCHj2TqKATE8xn+tW5YYcdiCJEKS9+c2FxQAAAClb1Bxpr/Sel0hGKVXVwnu3Q1ihA==</ApprovalStamp>
+  <AdditionalApprovalStamps />
+</ScriptFunctionDefinition>

@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<module>
+  <id>ce725b14-eb4c-4727-a0da-531b86fe442d</id>
+  <name>PerkinElmer.Apps.ImageryApp</name>
+  <version>1.0.0.0</version>
+  <intendedClient>Forms</intendedClient>
+  <assemblies>
+    <assembly>
+      <fullname>PerkinElmer.Apps.ImageryApp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=4d95002c27fab778</fullname>
+      <codebase>PerkinElmer.Apps.ImageryApp.dll</codebase>
+      <compatibility>
+        <min-version>0.0.0.0</min-version>
+        <max-version>#.#.*.*</max-version>
+      </compatibility>
+    </assembly>
+  </assemblies>
+  <extensions>
+    <addIn fullTypeName="PerkinElmer.Apps.ImageryApp.AddIn, PerkinElmer.Apps.ImageryApp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=4d95002c27fab778" />
+  </extensions>
+</module>

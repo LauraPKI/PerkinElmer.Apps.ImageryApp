@@ -1,0 +1,206 @@
+{
+  "components": [
+    {
+      "component": "ThreeTabsLayout",
+      "scope": "menu"
+    }
+  ],
+  "views": [
+    {
+      "view": "home",
+      "components": [
+        {
+          "component": "TableSelector",
+          "scope": "inputTable"
+        },
+        {
+          "component": "ColumnSelector",
+          "scope": "samples"
+        },
+        {
+          "component": "ColumnSelector",
+          "scope": "marker"
+        },
+        {
+          "component": "ColumnSelector",
+          "scope": "region"
+        },
+        {
+          "component": "ColumnSelector",
+          "scope": "features"
+        },
+        {
+          "component": "ColumnValuesSelector",
+          "scope": "featureSelection"
+        },
+        {
+          "component": "ColumnSelector",
+          "scope": "values"
+        },
+        {
+          "component": "ColumnSelector",
+          "scope": "categories"
+        },
+        {
+          "component": "Select",
+          "scope": "aggmethod",
+          "values": [
+            {
+              "scope": "aggmethod.options",
+              "value": [
+                {
+                  "label": "Mean",
+                  "value": "mean"
+                },
+                {
+                  "label": "Max",
+                  "value": "max"
+                },
+                {
+                  "label": "Min",
+                  "value": "min"
+                }
+              ]
+            }
+          ]
+        },
+		{
+		    "component": "Button",
+			"scope": "executeDf",
+			"value": "Run",
+            "params": {
+                "action": "statisticsDF"
+            }
+		}
+      ]
+    },
+    {
+      "view": "visualization",
+      "components": [ ]
+    },
+    {
+      "view": "configuration",
+      "components": [
+      ]
+    }
+  ],
+  "visualizationLayouts": [
+      {
+      "visualizationLayout": "default",
+      "layout": {
+        "grid": "column",
+        "children": [
+          {
+            "size": 100,
+            "visualization": "welcomePage"
+          }
+        ]
+      }
+    },
+    {
+      "visualizationLayout": "post-run",
+      "layout": {
+        "grid": "column",
+        "size": 100,
+        "children": [{
+            "size": 40,
+            "layout":{
+                "grid": "row",
+                "children": [{
+                    "size": 50,
+                    "visualization": "imageryBoxPlotViz",
+                    "refresh": {
+                        "action": "RefreshBoxPlotViz",
+                        "parametersId": [ "inputTable", "samples", "markers", "region", "values", "features", "featureSelection", "categories", "aggmethod"]
+					}
+				},
+                {
+                "size":50,
+                "visualization": "imageryScatterPlotViz"
+				}
+          ]}},
+          {
+            "size": 40,
+            "layout":{
+                "grid": "row",
+                "children": [{
+                    "size": 25,
+                    "visualization": "imageryLineChartViz"
+				},
+                {
+                    "size": 25,
+                    "visualization": "imageryLineChartCKViz"
+				},
+                {
+                    "size": 40,
+                    "visualization": "imageryBarChartViz"
+				}
+          ]}},
+          {
+                "size":20,
+                "visualization": "imageryTableViz",
+                "refresh": {
+                    "action": "RefreshTableViz",
+                    "parametersId": [ "inputTable", "samples", "markers", "region", "values", "features", "featureSelection", "categories", "aggmethod"]
+                }
+		}]
+    }
+}],
+"actions":[{
+      "name": "statisticsDF",
+      "type": "DataFunction",
+      "visualizationLayout": "post-run",
+      "settings": {
+        "id": "statisticsDF",
+        "path": "StatisticalFunction.xml",
+        "inputs": [
+            {
+                "parameterId": "inputTable",
+                "filteringSchemeId": "default_filter"
+            },
+            {
+                "parameterId": "samples",
+                "filteringSchemeId": "default_filter"
+            },
+            {
+                "parameterId": "marker",
+                "filteringSchemeId": "default_filter"
+            },
+            {
+                "parameterId": "region",
+                "filteringSchemeId": "default_filter"
+            },
+            {
+                "parameterId": "values",
+                "filteringSchemeId": "default_filter"
+            },
+            {
+                "parameterId": "categories",
+                "filteringSchemeId": "default_filter"
+            },
+            {
+                "parameterId": "features",
+                "filteringSchemeId": "default_filter"
+            },
+            {
+                "parameterId": "featureSelection",
+                "filteringSchemeId": "default_filter"
+            }
+        ],
+        "outputs":[
+        {
+                "parameterId": "statResult",
+                "action": "AddOrReplaceTable"
+            },
+            {
+                "parameterId": "cutOffTable",
+                "action": "AddOrReplaceTable"
+            }
+		]
+      }
+      }
+]
+}
+
+
+

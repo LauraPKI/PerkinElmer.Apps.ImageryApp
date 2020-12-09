@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<pbp:PackageBuilderProject SchemaVersion="1.1" Id="ce725b14-eb4c-4727-a0da-531b86fe442d" Name="PerkinElmer.Apps.ImageryApp" Version="1.0.0.0" IntendedClient="Forms" xmlns:pbp="http://spotfire.tibco.com/PackageBuilderProject.xsd">
+  <pbp:ModuleFile RelativePath="module.xml" UpdateAutomatically="true" />
+  <pbp:BuildFolder RelativePath="bin\Debug" />
+  <pbp:Files>
+    <pbp:File RelativePath="Newtonsoft.Json.dll" Included="false" ExtensionAssembly="true" />
+    <pbp:File RelativePath="Newtonsoft.Json.xml" Included="false" ExtensionAssembly="false" />
+    <pbp:File RelativePath="PerkinElmer.Apps.ImageryApp.dll.config" Included="false" ExtensionAssembly="false" />
+    <pbp:File RelativePath="PerkinElmer.Apps.ImageryApp.pdb" Included="false" ExtensionAssembly="false" />
+    <pbp:File RelativePath="PerkinElmer.Signals.Analytics.AppCommon.dll" Included="false" ExtensionAssembly="true" />
+    <pbp:File RelativePath="PerkinElmer.Signals.Analytics.Components.dll" Included="false" ExtensionAssembly="true" />
+    <pbp:File RelativePath="PerkinElmer.Signals.Groups.dll" Included="false" ExtensionAssembly="true" />
+    <pbp:File RelativePath="PerkinElmer.Signals.Spotfire.Common.dll" Included="false" ExtensionAssembly="true" />
+    <pbp:File RelativePath="PerkinElmer.Spotfire.Datafunctions.dll" Included="false" ExtensionAssembly="true" />
+    <pbp:File RelativePath="post-build.ps1" Included="false" ExtensionAssembly="false" />
+    <pbp:File RelativePath="Spotfire.Dxp.Application.dll" Included="false" ExtensionAssembly="true" />
+    <pbp:File RelativePath="Spotfire.Dxp.Data.dll" Included="false" ExtensionAssembly="true" />
+    <pbp:File RelativePath="Spotfire.Dxp.Data.Formats.Sbdf.dll" Included="false" ExtensionAssembly="true" />
+    <pbp:File RelativePath="Spotfire.Dxp.Data.Formats.Stdf.dll" Included="false" ExtensionAssembly="true" />
+    <pbp:File RelativePath="Spotfire.Dxp.Framework.dll" Included="false" ExtensionAssembly="true" />
+    <pbp:File RelativePath="Spotfire.Dxp.Internal.dll" Included="false" ExtensionAssembly="true" />
+    <pbp:File RelativePath="Spotfire.Dxp.Services.dll" Included="false" ExtensionAssembly="true" />
+    <pbp:File RelativePath="module.xml" Included="true" ExtensionAssembly="false" />
+    <pbp:File RelativePath="PerkinElmer.Apps.ImageryApp.dll" Included="true" ExtensionAssembly="true" />
+  </pbp:Files>
+</pbp:PackageBuilderProject>
